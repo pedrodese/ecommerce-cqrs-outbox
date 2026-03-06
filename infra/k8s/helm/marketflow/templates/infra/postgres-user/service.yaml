@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.userService.db.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.userService.db.name }}
+spec:
+  selector:
+    app: {{ .Values.userService.db.name }}
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP

@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.userService.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.userService.name }}
+spec:
+  replicas: {{ .Values.userService.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.userService.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.userService.name }}
+    spec:
+      containers:
+        - name: {{ .Values.userService.name }}
+          image: {{ .Values.userService.image }}:{{ .Values.userService.tag }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.userService.port }}
+          env:
+            - name: QUARKUS_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-user-secret
+                  key: username
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-user-secret
+                  key: password
+            - name: QUARKUS_DATASOURCE_JDBC_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-user-secret
+                  key: url
+            - name: QUARKUS_HTTP_PORT
+              value: "{{ .Values.userService.port }}"
+          volumeMounts:
+            - name: jwt-keys
+              mountPath: /deployments/config/META-INF
+              readOnly: true
+          resources:
+            requests:
+              cpu: {{ .Values.userService.resources.requests.cpu }}
+              memory: {{ .Values.userService.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.userService.resources.limits.cpu }}
+              memory: {{ .Values.userService.resources.limits.memory }}
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: {{ .Values.userService.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: {{ .Values.userService.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 15
+      volumes:
+        - name: jwt-keys
+          secret:
+            secretName: user-service-secret
+            items:
+              - key: jwt-private-key
+                path: privateKey.pem
+              - key: jwt-public-key
+                path: publicKey.pem

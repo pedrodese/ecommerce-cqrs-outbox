@@ -1,0 +1,45 @@
+global:
+  namespace: marketflow
+  imagePullPolicy: IfNotPresent
+
+rabbitmq:
+  image: rabbitmq:3.13-management-alpine
+  user: marketflow
+  password: marketflow_pass
+  vhost: marketflow
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+userService:
+  name: user-service
+  image: marketflow/user-service
+  tag: latest
+  port: 8081
+  replicas: 1
+  ingress:
+    host: user-service.marketflow.local
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  db:
+    name: postgres-user
+    image: postgres:16-alpine
+    database: user_db
+    username: user_svc
+    password: user_pass
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
