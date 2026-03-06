@@ -32,6 +32,14 @@ public class RefreshToken extends PanacheEntityBase {
     @Column(name = "created_at", updatable = false, nullable = false)
     public Instant createdAt;
 
+    public static RefreshToken of(User user, String token, long expirationSeconds) {
+        RefreshToken rt = new RefreshToken();
+        rt.token = token;
+        rt.user = user;
+        rt.expiresAt = Instant.now().plusSeconds(expirationSeconds);
+        return rt;
+    }
+
     @PrePersist
     public void prePersist() {
         this.createdAt = Instant.now();

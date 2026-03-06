@@ -116,7 +116,6 @@ services:
 
 
 volumes:
-  pgdata-keycloak:
   pgdata-user:
   pgdata-product:
   pgdata-order:

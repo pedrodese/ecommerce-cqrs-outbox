@@ -39,6 +39,10 @@ nb-configuration.xml
 # Local environment
 .env
 
+# JWT Keys
+src/main/resources/META-INF/privateKey.pem
+src/main/resources/META-INF/publicKey.pem
+
 # Plugin directory
 /.quarkus/cli/plugins/
 # TLS Certificates

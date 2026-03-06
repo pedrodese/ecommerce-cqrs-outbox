@@ -2,6 +2,8 @@ package com.marketflow.domain.entity;
 
 import com.marketflow.domain.enums.UserRole;
 import com.marketflow.domain.enums.UserStatus;
+import com.marketflow.dto.auth.RegisterRequest;
+import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
@@ -26,9 +28,6 @@ public class User extends PanacheEntityBase {
     @Column(name = "password_hash", nullable = false)
     public String passwordHash;
 
-    @Column(name = "refresh_token")
-    public String refreshToken;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     public UserRole role;
@@ -45,6 +44,16 @@ public class User extends PanacheEntityBase {
 
     @Column(name = "updated_at")
     public Instant updatedAt;
+
+    public static User of(RegisterRequest request) {
+        User user = new User();
+        user.name = request.name();
+        user.email = request.email();
+        user.passwordHash = BcryptUtil.bcryptHash(request.password());
+        user.role = request.role();
+        user.phone = request.phone();
+        return user;
+    }
 
     @PrePersist
     public void prePersist() {
