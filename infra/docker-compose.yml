@@ -1,0 +1,130 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: mf-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: marketflow
+      RABBITMQ_DEFAULT_PASS: marketflow_pass
+      RABBITMQ_DEFAULT_VHOST: marketflow
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - marketflow-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-user:
+    image: postgres:16-alpine
+    container_name: mf-postgres-user
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: user_svc
+      POSTGRES_PASSWORD: user_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata-user:/var/lib/postgresql/data
+    networks:
+      - marketflow-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user_svc -d user_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-product:
+    image: postgres:16-alpine
+    container_name: mf-postgres-product
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: product_svc
+      POSTGRES_PASSWORD: product_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata-product:/var/lib/postgresql/data
+    networks:
+      - marketflow-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U product_svc -d product_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-order:
+    image: postgres:16-alpine
+    container_name: mf-postgres-order
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: order_svc
+      POSTGRES_PASSWORD: order_pass
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata-order:/var/lib/postgresql/data
+    networks:
+      - marketflow-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U order_svc -d order_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-payment:
+    image: postgres:16-alpine
+    container_name: mf-postgres-payment
+    environment:
+      POSTGRES_DB: payment_db
+      POSTGRES_USER: payment_svc
+      POSTGRES_PASSWORD: payment_pass
+    ports:
+      - "5436:5432"
+    volumes:
+      - pgdata-payment:/var/lib/postgresql/data
+    networks:
+      - marketflow-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payment_svc -d payment_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-notification:
+    image: postgres:16-alpine
+    container_name: mf-postgres-notification
+    environment:
+      POSTGRES_DB: notification_db
+      POSTGRES_USER: notification_svc
+      POSTGRES_PASSWORD: notification_pass
+    ports:
+      - "5437:5432"
+    volumes:
+      - pgdata-notification:/var/lib/postgresql/data
+    networks:
+      - marketflow-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U notification_svc -d notification_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  pgdata-keycloak:
+  pgdata-user:
+  pgdata-product:
+  pgdata-order:
+  pgdata-payment:
+  pgdata-notification:
+
+  rabbitmq-data:
+
+networks:
+  marketflow-net:
+    driver: bridge
