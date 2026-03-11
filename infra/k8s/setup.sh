@@ -13,7 +13,7 @@ done
 echo "Dependências OK"
 
 echo ""
-echo "🔧 Criando cluster Kind..."
+echo "🔧 Criando cluster Kind.."
 if kind get clusters | grep -q "marketflow"; then
   echo "Cluster 'marketflow' já existe. Pulando criação."
 else

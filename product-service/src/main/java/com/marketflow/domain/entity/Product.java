@@ -2,8 +2,18 @@ package com.marketflow.domain.entity;
 
 import com.marketflow.domain.enums.ProductCategory;
 import com.marketflow.domain.enums.ProductStatus;
+import com.marketflow.dto.product.CreateProductRequest;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -46,6 +56,17 @@ public class Product extends PanacheEntityBase {
 
     @Column(name = "updated_at", nullable = false)
     public Instant updatedAt;
+
+    public static Product of(CreateProductRequest request, UUID sellerId) {
+        Product product = new Product();
+        product.name = request.name();
+        product.description = request.description();
+        product.price = request.price();
+        product.sku = request.sku();
+        product.category = request.category();
+        product.sellerId = sellerId;
+        return product;
+    }
 
     @PrePersist
     public void prePersist() {
