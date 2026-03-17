@@ -2,10 +2,8 @@ package com.marketflow.resource;
 
 
 import com.marketflow.dto.user.UpdateUserRequest;
-import com.marketflow.dto.user.UserResponse;
 import com.marketflow.service.UserService;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -20,7 +18,6 @@ public class UserResource {
 
     private final UserService userService;
 
-    @Inject
     public UserResource(UserService userService) {
         this.userService = userService;
     }
@@ -29,24 +26,21 @@ public class UserResource {
     @Path("/me")
     @RolesAllowed({"BUYER", "SELLER", "ADMIN"})
     public Response me() {
-        UserResponse response = new UserResponse(userService.findMe());
-        return Response.ok(response).build();
+        return Response.ok(userService.findMe()).build();
     }
 
     @GET
     @Path("/{id}")
     @RolesAllowed({"ADMIN"})
     public Response findById(@PathParam("id") UUID id) {
-        UserResponse response = new UserResponse(userService.findById(id));
-        return Response.ok(response).build();
+        return Response.ok(userService.findById(id)).build();
     }
 
     @PUT
     @Path("/{id}")
     @RolesAllowed({"BUYER", "SELLER", "ADMIN"})
     public Response update(@PathParam("id") UUID id, @Valid UpdateUserRequest request) {
-        UserResponse response = new UserResponse(userService.update(id, request));
-        return Response.ok(response).build();
+        return Response.ok(userService.update(id, request)).build();
     }
 
     @DELETE

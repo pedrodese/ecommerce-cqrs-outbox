@@ -4,10 +4,10 @@ package com.marketflow.service;
 import com.marketflow.domain.entity.User;
 import com.marketflow.domain.enums.UserStatus;
 import com.marketflow.dto.user.UpdateUserRequest;
+import com.marketflow.dto.user.UserResponse;
 import com.marketflow.exception.UserNotFoundException;
 import com.marketflow.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
@@ -19,27 +19,28 @@ public class UserService {
     private final JsonWebToken jwt;
     private final UserRepository userRepository;
 
-    @Inject
     public UserService(JsonWebToken jwt, UserRepository userRepository) {
         this.jwt = jwt;
         this.userRepository = userRepository;
     }
 
-    public User findMe() {
+    public UserResponse findMe() {
         UUID userId = UUID.fromString(jwt.getSubject());
-        return findByIdOrThrow(userId);
+        User user = findByIdOrThrow(userId);
+        return new UserResponse(user);
     }
 
-    public User findById(UUID id) {
-        return findByIdOrThrow(id);
+    public UserResponse findById(UUID id) {
+        User user = findByIdOrThrow(id);
+        return new UserResponse(user);
     }
 
     @Transactional
-    public User update(UUID id, UpdateUserRequest request) {
+    public UserResponse update(UUID id, UpdateUserRequest request) {
         User user = findByIdOrThrow(id);
         user.name = request.name();
         user.phone = request.phone();
-        return user;
+        return new UserResponse(user);
     }
 
     @Transactional
